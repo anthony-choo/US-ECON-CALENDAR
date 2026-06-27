@@ -1,0 +1,242 @@
+{
+  "FF|06-23-2026|1:45pm|Flash Manufacturing PMI": {
+    "title": "Flash Manufacturing PMI",
+    "impact": "Medium",
+    "dt_utc": "2026-06-23T17:45:00+00:00",
+    "all_day": false,
+    "forecast": "54.6",
+    "previous": "55.3",
+    "source": "ForexFactory",
+    "uid": "8cbbb12c-f27f-4bb7-8eb5-eb5e895758c3"
+  },
+  "FF|06-23-2026|1:45pm|Flash Services PMI": {
+    "title": "Flash Services PMI",
+    "impact": "Medium",
+    "dt_utc": "2026-06-23T17:45:00+00:00",
+    "all_day": false,
+    "forecast": "51.1",
+    "previous": "50.9",
+    "source": "ForexFactory",
+    "uid": "a236d993-ac87-4dd1-9312-79b8e7455569"
+  },
+  "FF|06-23-2026|6:05pm|President Trump Speaks": {
+    "title": "President Trump Speaks",
+    "impact": "Medium",
+    "dt_utc": "2026-06-23T22:05:00+00:00",
+    "all_day": false,
+    "forecast": "",
+    "previous": "",
+    "source": "ForexFactory",
+    "uid": "c715c257-7abf-4a80-a37b-920e018e77e9"
+  },
+  "FF|06-25-2026|12:30am|President Trump Speaks": {
+    "title": "President Trump Speaks",
+    "impact": "Medium",
+    "dt_utc": "2026-06-25T04:30:00+00:00",
+    "all_day": false,
+    "forecast": "",
+    "previous": "",
+    "source": "ForexFactory",
+    "uid": "8f08d597-5621-447c-90f0-f146148811d5"
+  },
+  "FF|06-25-2026|12:30pm|Core PCE Price Index m/m": {
+    "title": "Core PCE Price Index m/m",
+    "impact": "High",
+    "dt_utc": "2026-06-25T16:30:00+00:00",
+    "all_day": false,
+    "forecast": "0.3%",
+    "previous": "0.2%",
+    "source": "ForexFactory",
+    "uid": "ac871099-838e-4b54-8438-ad3c2defbf8f"
+  },
+  "FF|06-25-2026|12:30pm|Final GDP q/q": {
+    "title": "Final GDP q/q",
+    "impact": "High",
+    "dt_utc": "2026-06-25T16:30:00+00:00",
+    "all_day": false,
+    "forecast": "1.6%",
+    "previous": "1.6%",
+    "source": "ForexFactory",
+    "uid": "91eea7b2-6cd6-4963-a539-225809495a11"
+  },
+  "FF|06-25-2026|12:30pm|Final GDP Price Index q/q": {
+    "title": "Final GDP Price Index q/q",
+    "impact": "Medium",
+    "dt_utc": "2026-06-25T16:30:00+00:00",
+    "all_day": false,
+    "forecast": "3.5%",
+    "previous": "3.5%",
+    "source": "ForexFactory",
+    "uid": "ba9dfab4-ae35-4b56-9877-379199b19bbe"
+  },
+  "FF|06-25-2026|12:30pm|Unemployment Claims": {
+    "title": "Unemployment Claims",
+    "impact": "Medium",
+    "dt_utc": "2026-06-25T16:30:00+00:00",
+    "all_day": false,
+    "forecast": "225K",
+    "previous": "226K",
+    "source": "ForexFactory",
+    "uid": "3df491ce-6c85-42a5-a5c1-044b3be48383"
+  },
+  "FF|06-26-2026|2:00pm|Revised UoM Consumer Sentiment": {
+    "title": "Revised UoM Consumer Sentiment",
+    "impact": "Medium",
+    "dt_utc": "2026-06-26T18:00:00+00:00",
+    "all_day": false,
+    "forecast": "50.0",
+    "previous": "48.9",
+    "source": "ForexFactory",
+    "uid": "ea62f46e-c415-40c1-b4c2-7a7e1a0ec79b"
+  },
+  "FF|06-26-2026|2:00pm|Revised UoM Inflation Expectations": {
+    "title": "Revised UoM Inflation Expectations",
+    "impact": "Medium",
+    "dt_utc": "2026-06-26T18:00:00+00:00",
+    "all_day": false,
+    "forecast": "",
+    "previous": "4.6%",
+    "source": "ForexFactory",
+    "uid": "f639f5c4-4167-4697-a32f-39175bb96135"
+  },
+  "FF|06-26-2026|5:30pm|President Trump Speaks": {
+    "title": "President Trump Speaks",
+    "impact": "Medium",
+    "dt_utc": "2026-06-26T21:30:00+00:00",
+    "all_day": false,
+    "forecast": "",
+    "previous": "",
+    "source": "ForexFactory",
+    "uid": "50080c61-feee-460c-a171-d58a9d8a62e5"
+  },
+  "FOMC|2026-07-29": {
+    "title": "FOMC Rate Decision",
+    "impact": "High",
+    "dt_utc": "2026-07-29T18:00:00+00:00",
+    "all_day": false,
+    "forecast": "",
+    "previous": "",
+    "source": "Federal Reserve",
+    "uid": "4ce4f730-25b3-425f-9f9d-b53b66638470"
+  },
+  "FOMC|2026-09-16": {
+    "title": "FOMC Rate Decision",
+    "impact": "High",
+    "dt_utc": "2026-09-16T18:00:00+00:00",
+    "all_day": false,
+    "forecast": "",
+    "previous": "",
+    "source": "Federal Reserve",
+    "uid": "e6c0c8d6-a262-4407-977e-9fe0530bf264"
+  },
+  "FOMC|2026-10-28": {
+    "title": "FOMC Rate Decision",
+    "impact": "High",
+    "dt_utc": "2026-10-28T18:00:00+00:00",
+    "all_day": false,
+    "forecast": "",
+    "previous": "",
+    "source": "Federal Reserve",
+    "uid": "73ee64a2-b19b-4d30-92a9-5350c56bd28c"
+  },
+  "FOMC|2026-12-09": {
+    "title": "FOMC Rate Decision",
+    "impact": "High",
+    "dt_utc": "2026-12-09T19:00:00+00:00",
+    "all_day": false,
+    "forecast": "",
+    "previous": "",
+    "source": "Federal Reserve",
+    "uid": "9c68bc46-b27c-4b46-b013-182cd1508aa2"
+  },
+  "FOMC|2026-07-09": {
+    "title": "FOMC Rate Decision",
+    "impact": "High",
+    "dt_utc": "2026-07-09T18:00:00+00:00",
+    "all_day": false,
+    "forecast": "",
+    "previous": "",
+    "source": "Federal Reserve",
+    "uid": "66377b7c-adfb-4df8-9fbf-a5f603b54c7b"
+  },
+  "FOMC|2026-07-30": {
+    "title": "FOMC Rate Decision",
+    "impact": "High",
+    "dt_utc": "2026-07-30T18:00:00+00:00",
+    "all_day": false,
+    "forecast": "",
+    "previous": "",
+    "source": "Federal Reserve",
+    "uid": "cd502897-c12f-4394-b26c-d040e327f53c"
+  },
+  "FOMC|2026-08-20": {
+    "title": "FOMC Rate Decision",
+    "impact": "High",
+    "dt_utc": "2026-08-20T18:00:00+00:00",
+    "all_day": false,
+    "forecast": "",
+    "previous": "",
+    "source": "Federal Reserve",
+    "uid": "818a1605-61a3-4675-bf45-8f6c7612f2ef"
+  },
+  "FOMC|2026-08-22": {
+    "title": "FOMC Rate Decision",
+    "impact": "High",
+    "dt_utc": "2026-08-22T18:00:00+00:00",
+    "all_day": false,
+    "forecast": "",
+    "previous": "",
+    "source": "Federal Reserve",
+    "uid": "27c10e71-61b6-4b25-9fc3-6ed8391f6ae4"
+  },
+  "FOMC|2026-09-17": {
+    "title": "FOMC Rate Decision",
+    "impact": "High",
+    "dt_utc": "2026-09-17T18:00:00+00:00",
+    "all_day": false,
+    "forecast": "",
+    "previous": "",
+    "source": "Federal Reserve",
+    "uid": "952cac9b-480a-436b-a6fc-42011b68dc1b"
+  },
+  "FOMC|2026-10-08": {
+    "title": "FOMC Rate Decision",
+    "impact": "High",
+    "dt_utc": "2026-10-08T18:00:00+00:00",
+    "all_day": false,
+    "forecast": "",
+    "previous": "",
+    "source": "Federal Reserve",
+    "uid": "bcb81cac-b52d-4d73-b866-c3d3a566ed60"
+  },
+  "FOMC|2026-10-29": {
+    "title": "FOMC Rate Decision",
+    "impact": "High",
+    "dt_utc": "2026-10-29T18:00:00+00:00",
+    "all_day": false,
+    "forecast": "",
+    "previous": "",
+    "source": "Federal Reserve",
+    "uid": "5932f2d6-d6c5-47f6-bee9-34cc2054cc8b"
+  },
+  "FOMC|2026-11-19": {
+    "title": "FOMC Rate Decision",
+    "impact": "High",
+    "dt_utc": "2026-11-19T19:00:00+00:00",
+    "all_day": false,
+    "forecast": "",
+    "previous": "",
+    "source": "Federal Reserve",
+    "uid": "38ad4f2a-39c6-4c39-a62b-fd5fa26ec79d"
+  },
+  "FOMC|2026-12-10": {
+    "title": "FOMC Rate Decision",
+    "impact": "High",
+    "dt_utc": "2026-12-10T19:00:00+00:00",
+    "all_day": false,
+    "forecast": "",
+    "previous": "",
+    "source": "Federal Reserve",
+    "uid": "91a83ea8-ed58-420e-82a9-2bcc4ec10f10"
+  }
+}
