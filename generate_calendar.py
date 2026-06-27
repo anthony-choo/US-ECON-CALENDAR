@@ -2,7 +2,7 @@
 USD Economic Calendar — Full Year Auto-Sync
 Sources:
   1. ForexFactory     — rolling 2-week detailed feed
-  2. Federal Reserve  — FOMC meeting dates (full year)
+  2. Federal Reserve  — FOMC meeting dates (full year, deduplicated)
   3. BLS              — CPI, NFP, PPI, Retail Sales etc (full year)
   4. BEA              — GDP, PCE, Trade Balance etc (full year)
 """
@@ -26,7 +26,6 @@ HEADERS      = {"User-Agent": "Mozilla/5.0 (EconCalBot/2.0)"}
 # ── helpers ──────────────────────────────────────────────────────────────────
 
 def to_utc(dt_naive_eastern):
-    """Convert naive Eastern datetime → UTC, DST-aware."""
     return dt_naive_eastern.replace(tzinfo=EASTERN).astimezone(UTC)
 
 def make_event(title, impact, dt_utc, all_day=False,
@@ -36,8 +35,19 @@ def make_event(title, impact, dt_utc, all_day=False,
             "forecast": forecast, "previous": previous,
             "source": source, "uid": str(uuid.uuid4())}
 
+def parse_date(text):
+    """Try multiple date formats, return datetime or None."""
+    text = text.strip()
+    for fmt in ("%B %d, %Y", "%b. %d, %Y", "%b %d, %Y",
+                "%m/%d/%Y", "%Y-%m-%d", "%B %d %Y"):
+        try:
+            return datetime.strptime(text, fmt)
+        except ValueError:
+            pass
+    return None
 
-# ── SOURCE 1: ForexFactory XML ────────────────────────────────────────────────
+
+# ── SOURCE 1: ForexFactory ────────────────────────────────────────────────────
 
 def fetch_forexfactory():
     out = {}
@@ -48,7 +58,7 @@ def fetch_forexfactory():
             r.raise_for_status()
             root = ET.fromstring(r.content)
         except Exception as e:
-            print(f"  ⚠️  FF {url}: {e}"); continue
+            print(f"  ⚠️  FF: {e}"); continue
 
         for ev in root.findall("event"):
             if (ev.findtext("country") or "").strip() != "USD":
@@ -78,7 +88,7 @@ def fetch_forexfactory():
                 if t is None:
                     dt_utc, all_day = date.replace(tzinfo=UTC), True
                 else:
-                    dt_utc  = to_utc(date.replace(hour=t.hour, minute=t.minute))
+                    dt_utc = to_utc(date.replace(hour=t.hour, minute=t.minute))
                     all_day = False
 
             key = f"FF|{date_s}|{time_s}|{title}"
@@ -89,47 +99,57 @@ def fetch_forexfactory():
     return out
 
 
-# ── SOURCE 2: Federal Reserve — FOMC ─────────────────────────────────────────
+# ── SOURCE 2: Federal Reserve FOMC ───────────────────────────────────────────
 
 def fetch_fomc():
-    out = {}
+    raw = {}
     url = "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
     try:
         r = requests.get(url, timeout=15, headers=HEADERS)
         r.raise_for_status()
         soup = BeautifulSoup(r.text, "html.parser")
     except Exception as e:
-        print(f"  ⚠️  FOMC: {e}"); return out
+        print(f"  ⚠️  FOMC: {e}"); return {}
 
-    year_s = str(YEAR)
-    full_text = soup.get_text(" ")
+    year_s  = str(YEAR)
+    months  = (r"January|February|March|April|May|June|"
+               r"July|August|September|October|November|December")
+    pattern = rf"({months})\s+(\d{{1,2}})(?:[-–](\d{{1,2}}))?(?:,?\s*{year_s})?"
 
-    # Pattern: "January 27-28" or "March 18" possibly followed by year
-    months_re = (r"(January|February|March|April|May|June|"
-                 r"July|August|September|October|November|December)")
-    pat = rf"{months_re}\s+(\d{{1,2}})(?:[-–](\d{{1,2}}))?(?:,?\s*{year_s})?"
-
-    # Only scan the section near the current year
-    idx = full_text.find(year_s)
+    text = soup.get_text(" ")
+    idx  = text.find(year_s)
     if idx == -1:
-        print("  ⚠️  FOMC: year not found on page"); return out
-    section = full_text[idx: idx + 3000]
+        print("  ⚠️  FOMC: year not found"); return {}
 
-    for m in re.finditer(pat, section):
-        month_name, day1, day2 = m.group(1), m.group(2), m.group(3)
-        day = int(day2) if day2 else int(day1)   # decision = last day of meeting
+    section = text[idx: idx + 4000]
+
+    for m in re.finditer(pattern, section):
+        month_name, day1, day2 = m.group(1), int(m.group(2)), m.group(3)
+        # Use the LAST day of the meeting (decision / rate announcement day)
+        day = int(day2) if day2 else day1
         try:
             dt_naive = datetime.strptime(f"{month_name} {day} {year_s}", "%B %d %Y")
         except ValueError:
             continue
-        dt_naive = dt_naive.replace(hour=14, minute=0)   # Fed announces at 2 PM ET
+        dt_naive = dt_naive.replace(hour=14, minute=0)  # 2 PM ET
         dt_utc   = to_utc(dt_naive)
         if dt_utc.year != YEAR:
             continue
+
+        # Key by ISO week → keeps only ONE event per meeting week (no duplicates)
+        week_key = f"FOMC-W{dt_utc.isocalendar()[1]}-{dt_utc.year}"
+        if week_key not in raw:
+            raw[week_key] = (dt_utc, dt_naive, month_name, day)
+        else:
+            # Keep the later date (true decision day)
+            if dt_utc > raw[week_key][0]:
+                raw[week_key] = (dt_utc, dt_naive, month_name, day)
+
+    out = {}
+    for week_key, (dt_utc, _, month_name, day) in raw.items():
         key = f"FOMC|{dt_utc.date()}"
-        if key not in out:
-            out[key] = make_event("FOMC Rate Decision", "High",
-                                  dt_utc, source="Federal Reserve")
+        out[key] = make_event("FOMC Rate Decision", "High",
+                              dt_utc, source="Federal Reserve")
 
     print(f"  ✅ FOMC: {len(out)} events")
     return out
@@ -138,15 +158,15 @@ def fetch_fomc():
 # ── SOURCE 3: BLS Release Schedule ───────────────────────────────────────────
 
 BLS_MAP = {
-    "Consumer Price Index":   ("CPI",              "High"),
-    "Employment Situation":   ("Non-Farm Payrolls","High"),
-    "Producer Price Index":   ("PPI",              "Medium"),
-    "Unemployment Insurance": ("Jobless Claims",   "Medium"),
-    "Job Openings":           ("JOLTS",            "Medium"),
-    "Advance Monthly Retail": ("Retail Sales",     "High"),
-    "Import and Export":      ("Import/Export Prices","Medium"),
-    "Productivity and Costs": ("Productivity",     "Medium"),
-    "Consumer Expenditures":  ("Consumer Spending","Medium"),
+    "Consumer Price Index":   ("CPI",               "High"),
+    "Employment Situation":   ("Non-Farm Payrolls", "High"),
+    "Producer Price Index":   ("PPI",               "Medium"),
+    "Unemployment Insurance": ("Jobless Claims",    "Medium"),
+    "Job Openings":           ("JOLTS",             "Medium"),
+    "Retail Sales":           ("Retail Sales",      "High"),
+    "Advance Monthly":        ("Retail Sales",      "High"),
+    "Import and Export":      ("Import/Export Prices", "Medium"),
+    "Productivity":           ("Productivity",      "Medium"),
 }
 
 def fetch_bls():
@@ -157,34 +177,41 @@ def fetch_bls():
         r.raise_for_status()
         soup = BeautifulSoup(r.text, "html.parser")
     except Exception as e:
-        print(f"  ⚠️  BLS: {e}"); return out
+        print(f"  ⚠️  BLS fetch: {e}"); return out
 
-    for row in soup.find_all("tr"):
-        cells = [c.get_text(" ", strip=True) for c in row.find_all("td")]
-        if len(cells) < 2:
+    # Strategy: scan every <a> tag — release names are usually links on BLS
+    date_pattern = (r"(\w+\.?\s+\d{1,2},?\s*\d{4})"
+                    r"|(\d{1,2}/\d{1,2}/\d{4})"
+                    r"|(\d{4}-\d{2}-\d{2})")
+
+    for tag in soup.find_all(["a", "li", "td", "p", "div"]):
+        text = tag.get_text(" ", strip=True)
+        if not text or len(text) > 300:
             continue
-        row_text = " ".join(cells)
 
         title, impact = None, "Medium"
         for kw, (t, i) in BLS_MAP.items():
-            if kw.lower() in row_text.lower():
+            if kw.lower() in text.lower():
                 title, impact = t, i; break
         if not title:
             continue
 
-        # Find date in any cell
-        dt_naive = None
-        for cell in cells:
-            for fmt in ("%B %d, %Y", "%b. %d, %Y", "%m/%d/%Y", "%Y-%m-%d"):
-                try:
-                    dt_naive = datetime.strptime(cell.strip(), fmt); break
-                except ValueError: pass
-            if dt_naive: break
+        # Gather context (parent element text for dates)
+        context = text
+        if tag.parent:
+            context = tag.parent.get_text(" ", strip=True)
+
+        dm = re.search(date_pattern, context, re.I)
+        if not dm:
+            continue
+
+        dt_naive = parse_date(dm.group(0))
         if not dt_naive or dt_naive.year != YEAR:
             continue
 
-        # Time — BLS typically 8:30 AM ET
-        tm = re.search(r"(\d{1,2}):(\d{2})\s*(a\.?m\.?|p\.?m\.?)?", row_text, re.I)
+        # BLS typically releases at 8:30 AM ET
+        tm = re.search(r"(\d{1,2}):(\d{2})\s*(a\.?m\.?|p\.?m\.?)?",
+                       context, re.I)
         h, mn = (int(tm.group(1)), int(tm.group(2))) if tm else (8, 30)
         if tm and tm.group(3) and "p" in tm.group(3).lower() and h != 12:
             h += 12
@@ -194,6 +221,29 @@ def fetch_bls():
         if key not in out:
             out[key] = make_event(title, impact, dt_utc, source="BLS")
 
+    # Fallback: scan raw text of full page
+    if not out:
+        full_text = soup.get_text("\n")
+        lines = [l.strip() for l in full_text.splitlines() if l.strip()]
+        for i, line in enumerate(lines):
+            title, impact = None, "Medium"
+            for kw, (t, imp) in BLS_MAP.items():
+                if kw.lower() in line.lower():
+                    title, impact = t, imp; break
+            if not title:
+                continue
+            context = " ".join(lines[max(0, i-3): i+4])
+            dm = re.search(date_pattern, context, re.I)
+            if not dm:
+                continue
+            dt_naive = parse_date(dm.group(0))
+            if not dt_naive or dt_naive.year != YEAR:
+                continue
+            dt_utc = to_utc(dt_naive.replace(hour=8, minute=30))
+            key = f"BLS|{dt_utc.date()}|{title}"
+            if key not in out:
+                out[key] = make_event(title, impact, dt_utc, source="BLS")
+
     print(f"  ✅ BLS: {len(out)} events")
     return out
 
@@ -201,14 +251,13 @@ def fetch_bls():
 # ── SOURCE 4: BEA Release Schedule ───────────────────────────────────────────
 
 BEA_MAP = {
-    "Gross Domestic Product":  ("GDP",                "High"),
-    " GDP":                    ("GDP",                "High"),
+    "Gross Domestic Product":  ("GDP",                 "High"),
+    "GDP":                     ("GDP",                 "High"),
     "Personal Income":         ("PCE / Personal Income","High"),
-    "Personal Consumption":    ("PCE",                "High"),
-    "International Trade":     ("Trade Balance",      "Medium"),
-    "Current Account":         ("Current Account",    "Medium"),
-    "Corporate Profits":       ("Corporate Profits",  "Medium"),
-    "Gross Domestic Income":   ("GDI",               "Medium"),
+    "Personal Consumption":    ("PCE",                 "High"),
+    "International Trade":     ("Trade Balance",       "Medium"),
+    "Current Account":         ("Current Account",     "Medium"),
+    "Corporate Profits":       ("Corporate Profits",   "Medium"),
 }
 
 def fetch_bea():
@@ -219,29 +268,34 @@ def fetch_bea():
         r.raise_for_status()
         soup = BeautifulSoup(r.text, "html.parser")
     except Exception as e:
-        print(f"  ⚠️  BEA: {e}"); return out
+        print(f"  ⚠️  BEA fetch: {e}"); return out
 
-    date_pat = (r"(\w+ \d{1,2},\s*\d{4})"
-                r"|(\d{1,2}/\d{1,2}/\d{4})"
-                r"|(\d{4}-\d{2}-\d{2})")
+    date_pattern = (r"(\w+\.?\s+\d{1,2},?\s*\d{4})"
+                    r"|(\d{1,2}/\d{1,2}/\d{4})"
+                    r"|(\d{4}-\d{2}-\d{2})")
 
-    for row in soup.find_all("tr"):
-        row_text = row.get_text(" ", strip=True)
+    for tag in soup.find_all(["tr", "li", "div", "p", "td"]):
+        text = tag.get_text(" ", strip=True)
+        if not text or len(text) > 400:
+            continue
+
         title, impact = None, "Medium"
         for kw, (t, i) in BEA_MAP.items():
-            if kw.lower() in row_text.lower():
+            if kw.lower() in text.lower():
                 title, impact = t, i; break
         if not title:
             continue
 
-        dm = re.search(date_pat, row_text)
+        dm = re.search(date_pattern, text, re.I)
+        if not dm:
+            # Try parent
+            if tag.parent:
+                parent_text = tag.parent.get_text(" ", strip=True)
+                dm = re.search(date_pattern, parent_text, re.I)
         if not dm:
             continue
-        date_s = dm.group(0).strip()
-        dt_naive = None
-        for fmt in ("%B %d, %Y", "%B %d %Y", "%m/%d/%Y", "%Y-%m-%d"):
-            try: dt_naive = datetime.strptime(date_s, fmt); break
-            except ValueError: pass
+
+        dt_naive = parse_date(dm.group(0))
         if not dt_naive or dt_naive.year != YEAR:
             continue
 
@@ -249,6 +303,29 @@ def fetch_bea():
         key = f"BEA|{dt_utc.date()}|{title}"
         if key not in out:
             out[key] = make_event(title, impact, dt_utc, source="BEA")
+
+    # Fallback: full text scan
+    if not out:
+        full_text = soup.get_text("\n")
+        lines = [l.strip() for l in full_text.splitlines() if l.strip()]
+        for i, line in enumerate(lines):
+            title, impact = None, "Medium"
+            for kw, (t, imp) in BEA_MAP.items():
+                if kw.lower() in line.lower():
+                    title, impact = t, imp; break
+            if not title:
+                continue
+            context = " ".join(lines[max(0, i-3): i+4])
+            dm = re.search(date_pattern, context, re.I)
+            if not dm:
+                continue
+            dt_naive = parse_date(dm.group(0))
+            if not dt_naive or dt_naive.year != YEAR:
+                continue
+            dt_utc = to_utc(dt_naive.replace(hour=8, minute=30))
+            key = f"BEA|{dt_utc.date()}|{title}"
+            if key not in out:
+                out[key] = make_event(title, impact, dt_utc, source="BEA")
 
     print(f"  ✅ BEA: {len(out)} events")
     return out
@@ -281,7 +358,8 @@ def build_ics(events):
         desc  = " | ".join(filter(None, [
             f"Forecast: {e['forecast']}" if e.get("forecast") else "",
             f"Previous: {e['previous']}" if e.get("previous") else "",
-            f"Source: {e.get('source','')}"]))  or "No forecast yet"
+            f"Source: {e.get('source','')}"
+        ])) or "No forecast yet"
 
         lines += ["BEGIN:VEVENT",
                   f"UID:{e['uid']}@usd-econ-cal",
@@ -337,11 +415,10 @@ if __name__ == "__main__":
     SGT = ZoneInfo("Asia/Singapore")
     now = datetime.now(UTC).isoformat()
     upcoming = sorted([e for e in merged.values() if e["dt_utc"] >= now],
-                      key=lambda x: x["dt_utc"])[:30]
+                      key=lambda x: x["dt_utc"])[:40]
     print("\n── Upcoming (SGT) ──")
     for e in upcoming:
         sgt = datetime.fromisoformat(e["dt_utc"]).astimezone(SGT)
-        src = e.get("source", "")
         print(f"  {IMPACT_EMOJI.get(e['impact'],'')} "
               f"{sgt.strftime('%d %b %H:%M')} SGT  "
-              f"{e['title']}  [{src}]")
+              f"{e['title']}  [{e.get('source','')}]")
