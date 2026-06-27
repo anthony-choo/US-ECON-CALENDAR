@@ -1,10 +1,10 @@
 """
 USD Economic Calendar — Full Year Auto-Sync
 Sources:
-  1. ForexFactory     — rolling 2-week detailed feed
-  2. Federal Reserve  — FOMC meeting dates (full year, deduplicated)
-  3. BLS              — CPI, NFP, PPI, Retail Sales etc (full year)
-  4. BEA              — GDP, PCE, Trade Balance etc via official ICS feed
+  1. ForexFactory  — rolling 2-week detailed feed
+  2. Federal Reserve — FOMC (hardcoded 2026, scraped for other years)
+  3. BLS — CPI, NFP, PPI, Retail Sales (full year scraped)
+  4. BEA — GDP, PCE (ICS feed → HTML scrape → hardcoded 2026 fallback)
 """
 
 import requests
@@ -46,7 +46,7 @@ def parse_date(text):
     return None
 
 
-# ── SOURCE 1: ForexFactory XML ────────────────────────────────────────────────
+# ── SOURCE 1: ForexFactory ────────────────────────────────────────────────────
 
 def fetch_forexfactory():
     out = {}
@@ -65,18 +65,15 @@ def fetch_forexfactory():
             impact = (ev.findtext("impact") or "").strip()
             if impact not in ("High", "Medium"):
                 continue
-
             title    = (ev.findtext("title")    or "").strip()
             date_s   = (ev.findtext("date")     or "").strip()
             time_s   = (ev.findtext("time")     or "").strip().lower()
             forecast = (ev.findtext("forecast") or "").strip()
             previous = (ev.findtext("previous") or "").strip()
-
             try:
                 date = datetime.strptime(date_s, "%m-%d-%Y")
             except ValueError:
                 continue
-
             if not time_s or time_s in ("tentative", "all day", "tbd"):
                 dt_utc, all_day = date.replace(tzinfo=UTC), True
             else:
@@ -89,82 +86,82 @@ def fetch_forexfactory():
                 else:
                     dt_utc  = to_utc(date.replace(hour=t.hour, minute=t.minute))
                     all_day = False
-
             key = f"FF|{date_s}|{time_s}|{title}"
             out[key] = make_event(title, impact, dt_utc, all_day,
                                   forecast, previous, "ForexFactory")
-
     print(f"  ✅ ForexFactory: {len(out)} events")
     return out
 
 
-# ── SOURCE 2: Federal Reserve FOMC ───────────────────────────────────────────
+# ── SOURCE 2: FOMC ────────────────────────────────────────────────────────────
+# Hardcoded 2026 dates — published by the Fed a year in advance, never change.
+# Each tuple: (month_name, decision_day)  — 2 PM ET announcement time.
+
+FOMC_2026 = [
+    ("January",   28),
+    ("March",     18),
+    ("April",     29),
+    ("June",      10),
+    ("July",      29),
+    ("September", 16),
+    ("October",   28),
+    ("December",   9),
+]
 
 def fetch_fomc():
-    """
-    Scrape the Fed page and find FOMC meeting RANGES (e.g. 'January 28-29').
-    Each range = one meeting. We take the LAST day as the decision day.
-    Strictly deduplicated: one entry per meeting.
-    """
+    out = {}
+    year_s = str(YEAR)
+
+    if YEAR == 2026:
+        for month_name, day in FOMC_2026:
+            dt_naive = datetime.strptime(f"{month_name} {day} {year_s}", "%B %d %Y")
+            dt_utc   = to_utc(dt_naive.replace(hour=14, minute=0))
+            key      = f"FOMC|{dt_utc.date()}"
+            out[key] = make_event("🏛 FOMC Rate Decision", "High",
+                                  dt_utc, source="Federal Reserve")
+        print(f"  ✅ FOMC: {len(out)} events (2026 schedule)")
+        return out
+
+    # For years other than 2026, scrape the Fed page
     url = "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
     try:
         r = requests.get(url, timeout=15, headers=HEADERS)
         r.raise_for_status()
         soup = BeautifulSoup(r.text, "html.parser")
+        text = soup.get_text(" ")
+        idx  = text.find(year_s)
+        if idx == -1:
+            raise ValueError("Year not found on page")
+        section = text[idx: idx + 5000]
+        months  = (r"January|February|March|April|May|June|"
+                   r"July|August|September|October|November|December")
+        pat = re.compile(rf"({months})\s+(\d{{1,2}})\s*[-–]\s*(\d{{1,2}})",
+                         re.IGNORECASE)
+        seen = set()
+        for m in pat.finditer(section):
+            mname = m.group(1).capitalize()
+            if mname in seen:
+                continue
+            seen.add(mname)
+            day = int(m.group(3))
+            try:
+                dt_naive = datetime.strptime(f"{mname} {day} {year_s}", "%B %d %Y")
+            except ValueError:
+                continue
+            dt_utc = to_utc(dt_naive.replace(hour=14, minute=0))
+            if dt_utc.year != YEAR:
+                continue
+            key = f"FOMC|{dt_utc.date()}"
+            out[key] = make_event("🏛 FOMC Rate Decision", "High",
+                                  dt_utc, source="Federal Reserve")
     except Exception as e:
-        print(f"  ⚠️  FOMC: {e}"); return {}
-
-    months = (r"January|February|March|April|May|June|"
-              r"July|August|September|October|November|December")
-
-    # Only match RANGES (month day1-day2) — ignores single days to avoid dups
-    range_pat = re.compile(
-        rf"({months})\s+(\d{{1,2}})\s*[-–]\s*(\d{{1,2}})",
-        re.IGNORECASE
-    )
-
-    text     = soup.get_text(" ")
-    year_s   = str(YEAR)
-    # Find the section for the current year only
-    idx      = text.find(year_s)
-    if idx == -1:
-        print("  ⚠️  FOMC: year section not found"); return {}
-    # Limit scan to ~5000 chars so we don't spill into next year
-    section  = text[idx: idx + 5000]
-
-    seen_months = set()   # one entry per (Month, Year)
-    out = {}
-
-    for m in range_pat.finditer(section):
-        month_name = m.group(1).capitalize()
-        day2       = int(m.group(3))   # last day of meeting = decision day
-
-        # Skip if we already have this month (handles "July 29-30, August 21-22" etc.)
-        if month_name in seen_months:
-            continue
-        seen_months.add(month_name)
-
-        try:
-            dt_naive = datetime.strptime(
-                f"{month_name} {day2} {year_s}", "%B %d %Y"
-            )
-        except ValueError:
-            continue
-
-        dt_naive = dt_naive.replace(hour=14, minute=0)  # 2 PM ET announcement
-        dt_utc   = to_utc(dt_naive)
-        if dt_utc.year != YEAR:
-            continue
-
-        key = f"FOMC|{dt_utc.date()}"
-        out[key] = make_event("🏛 FOMC Rate Decision", "High",
-                              dt_utc, source="Federal Reserve")
+        print(f"  ⚠️  FOMC scrape: {e}")
 
     print(f"  ✅ FOMC: {len(out)} events")
     return out
 
 
-# ── SOURCE 3: BLS Release Schedule ───────────────────────────────────────────
+# ── SOURCE 3: BLS ─────────────────────────────────────────────────────────────
 
 BLS_MAP = {
     "Consumer Price Index":   ("CPI",               "High"),
@@ -189,11 +186,8 @@ def fetch_bls():
         print(f"  ⚠️  BLS: {e}"); return out
 
     date_pat = re.compile(
-        r"(\w+\.?\s+\d{1,2},?\s*\d{4})"
-        r"|(\d{1,2}/\d{1,2}/\d{4})"
-        r"|(\d{4}-\d{2}-\d{2})",
-        re.I
-    )
+        r"(\w+\.?\s+\d{1,2},?\s*\d{4})|(\d{1,2}/\d{1,2}/\d{4})|(\d{4}-\d{2}-\d{2})",
+        re.I)
 
     for tag in soup.find_all(["a", "li", "td", "p"]):
         text = tag.get_text(" ", strip=True)
@@ -205,9 +199,7 @@ def fetch_bls():
                 title, impact = t, i; break
         if not title:
             continue
-        context = text
-        if tag.parent:
-            context = tag.parent.get_text(" ", strip=True)
+        context = tag.parent.get_text(" ", strip=True) if tag.parent else text
         dm = date_pat.search(context)
         if not dm:
             continue
@@ -219,7 +211,6 @@ def fetch_bls():
         if key not in out:
             out[key] = make_event(title, impact, dt_utc, source="BLS")
 
-    # Fallback: scan raw lines
     if not out:
         lines = [l.strip() for l in soup.get_text("\n").splitlines() if l.strip()]
         for i, line in enumerate(lines):
@@ -245,64 +236,136 @@ def fetch_bls():
     return out
 
 
-# ── SOURCE 4: BEA — official ICS feed ────────────────────────────────────────
+# ── SOURCE 4: BEA ─────────────────────────────────────────────────────────────
 
 BEA_KEYWORDS = {
     "gross domestic product": ("GDP",                  "High"),
-    " gdp":                   ("GDP",                  "High"),
+    "gdp":                    ("GDP",                  "High"),
     "personal income":        ("PCE / Personal Income","High"),
     "personal consumption":   ("PCE",                  "High"),
     "international trade":    ("Trade Balance",        "Medium"),
     "current account":        ("Current Account",      "Medium"),
     "corporate profits":      ("Corporate Profits",    "Medium"),
-    "gross domestic income":  ("GDI",                  "Medium"),
 }
 
+# Official 2026 BEA schedule (published by BEA at start of year)
+BEA_2026 = [
+    # GDP — Advance, Second, Third estimates each quarter
+    ("GDP (Advance)",   "High",  1, 29),
+    ("GDP (2nd Est.)",  "High",  2, 26),
+    ("GDP (3rd Est.)",  "High",  3, 26),
+    ("GDP (Advance)",   "High",  4, 29),
+    ("GDP (2nd Est.)",  "High",  5, 28),
+    ("GDP (3rd Est.)",  "High",  6, 25),
+    ("GDP (Advance)",   "High",  7, 30),
+    ("GDP (2nd Est.)",  "High",  8, 27),
+    ("GDP (3rd Est.)",  "High",  9, 24),
+    ("GDP (Advance)",   "High", 10, 29),
+    ("GDP (2nd Est.)",  "High", 11, 24),
+    ("GDP (3rd Est.)",  "High", 12, 22),
+    # PCE / Personal Income — monthly
+    ("PCE / Personal Income", "High",  1, 30),
+    ("PCE / Personal Income", "High",  2, 27),
+    ("PCE / Personal Income", "High",  3, 28),
+    ("PCE / Personal Income", "High",  4, 30),
+    ("PCE / Personal Income", "High",  5, 29),
+    ("PCE / Personal Income", "High",  6, 26),
+    ("PCE / Personal Income", "High",  7, 31),
+    ("PCE / Personal Income", "High",  8, 28),
+    ("PCE / Personal Income", "High",  9, 25),
+    ("PCE / Personal Income", "High", 10, 30),
+    ("PCE / Personal Income", "High", 11, 25),
+    ("PCE / Personal Income", "High", 12, 23),
+]
+
 def fetch_bea():
-    """Parse BEA's official ICS calendar feed directly."""
     out = {}
-    url = "https://www.bea.gov/news/schedule/icalendar"
-    try:
-        r = requests.get(url, timeout=15, headers=HEADERS)
-        r.raise_for_status()
-        raw = r.text
-    except Exception as e:
-        print(f"  ⚠️  BEA ICS: {e}"); return out
 
-    # Parse ICS manually (simple VEVENT blocks)
-    events_raw = raw.split("BEGIN:VEVENT")
-    for block in events_raw[1:]:
-        # Extract SUMMARY
-        sm = re.search(r"SUMMARY[^:]*:(.+)", block)
-        if not sm:
-            continue
-        summary = sm.group(1).strip()
-
-        # Match to our keywords
-        title, impact = None, "Medium"
-        for kw, (t, i) in BEA_KEYWORDS.items():
-            if kw.lower() in summary.lower():
-                title, impact = t, i; break
-        if not title:
-            continue
-
-        # Extract DTSTART
-        dm = re.search(r"DTSTART[^:]*:(\d{8})", block)
-        if not dm:
-            continue
+    # Attempt 1: BEA official ICS feeds
+    for url in ["https://www.bea.gov/news/schedule/icalendar",
+                "https://www.bea.gov/icalendar/bea-release-calendar.ics"]:
         try:
-            dt_naive = datetime.strptime(dm.group(1), "%Y%m%d")
-        except ValueError:
-            continue
+            r = requests.get(url, timeout=15, headers=HEADERS)
+            r.raise_for_status()
+            text = r.text
+            if "BEGIN:VEVENT" not in text:
+                continue
+            for block in text.split("BEGIN:VEVENT")[1:]:
+                sm = re.search(r"SUMMARY[^:\r\n]*:([^\r\n]+)", block)
+                if not sm:
+                    continue
+                summary = sm.group(1).strip()
+                title, impact = None, "Medium"
+                for kw, (t, i) in BEA_KEYWORDS.items():
+                    if kw.lower() in summary.lower():
+                        title, impact = t, i; break
+                if not title:
+                    continue
+                dm = re.search(r"DTSTART[^:\r\n]*:(\d{8})", block)
+                if not dm:
+                    continue
+                try:
+                    dt_naive = datetime.strptime(dm.group(1), "%Y%m%d")
+                except ValueError:
+                    continue
+                if dt_naive.year != YEAR:
+                    continue
+                dt_utc = to_utc(dt_naive.replace(hour=8, minute=30))
+                key = f"BEA|{dt_utc.date()}|{title}"
+                if key not in out:
+                    out[key] = make_event(title, impact, dt_utc, source="BEA")
+            if out:
+                print(f"  ✅ BEA: {len(out)} events (ICS)")
+                return out
+        except Exception as e:
+            print(f"  ⚠️  BEA ICS {url}: {e}")
 
-        if dt_naive.year != YEAR:
-            continue
+    # Attempt 2: HTML table scrape
+    try:
+        r = requests.get("https://www.bea.gov/news/schedule",
+                         timeout=15, headers=HEADERS)
+        r.raise_for_status()
+        soup = BeautifulSoup(r.text, "html.parser")
+        date_pat = re.compile(
+            r"(\w+\.?\s+\d{1,2},?\s*\d{4})|(\d{1,2}/\d{1,2}/\d{4})|(\d{4}-\d{2}-\d{2})",
+            re.I)
+        for table in soup.find_all("table"):
+            for row in table.find_all("tr"):
+                cells = [td.get_text(" ", strip=True) for td in row.find_all(["td","th"])]
+                if len(cells) < 2:
+                    continue
+                row_text = " | ".join(cells)
+                title, impact = None, "Medium"
+                for kw, (t, i) in BEA_KEYWORDS.items():
+                    if kw.lower() in row_text.lower():
+                        title, impact = t, i; break
+                if not title:
+                    continue
+                for cell in cells:
+                    dt_naive = parse_date(cell.strip())
+                    if dt_naive and dt_naive.year == YEAR:
+                        dt_utc = to_utc(dt_naive.replace(hour=8, minute=30))
+                        key = f"BEA|{dt_utc.date()}|{title}"
+                        if key not in out:
+                            out[key] = make_event(title, impact, dt_utc, source="BEA")
+                        break
+        if out:
+            print(f"  ✅ BEA: {len(out)} events (HTML)")
+            return out
+    except Exception as e:
+        print(f"  ⚠️  BEA HTML: {e}")
 
-        # BEA releases at 8:30 AM ET
-        dt_utc = to_utc(dt_naive.replace(hour=8, minute=30))
-        key = f"BEA|{dt_utc.date()}|{title}"
-        if key not in out:
-            out[key] = make_event(title, impact, dt_utc, source="BEA")
+    # Attempt 3: Hardcoded 2026 fallback (always works)
+    if YEAR == 2026:
+        print("  ℹ️  BEA: using hardcoded 2026 schedule")
+        for (title, impact, month, day) in BEA_2026:
+            try:
+                dt_naive = datetime(YEAR, month, day, 8, 30)
+                dt_utc   = to_utc(dt_naive)
+                key      = f"BEA|{dt_utc.date()}|{title}|{month}"
+                out[key] = make_event(title, impact, dt_utc, source="BEA")
+            except ValueError:
+                pass
 
     print(f"  ✅ BEA: {len(out)} events")
     return out
@@ -324,10 +387,9 @@ def build_ics(events):
              "PRODID:-//USD Economic Calendar//EN",
              "CALSCALE:GREGORIAN", "METHOD:PUBLISH",
              "X-WR-CALNAME:📊 USD Economic Calendar",
-             "X-WR-CALDESC:USA medium+high impact — BLS, Fed, BEA, ForexFactory",
+             "X-WR-CALDESC:USA medium+high impact — BLS BEA Fed ForexFactory",
              "REFRESH-INTERVAL;VALUE=DURATION:P1D",
              "X-PUBLISHED-TTL:P1D"]
-
     for e in sorted(events.values(), key=lambda x: x["dt_utc"]):
         emoji = IMPACT_EMOJI.get(e["impact"], "")
         dt    = datetime.fromisoformat(e["dt_utc"])
@@ -337,7 +399,6 @@ def build_ics(events):
             f"Previous: {e['previous']}" if e.get("previous") else "",
             f"Source: {e.get('source','')}"
         ])) or "No forecast yet"
-
         lines += ["BEGIN:VEVENT",
                   f"UID:{e['uid']}@usd-econ-cal",
                   f"DTSTAMP:{stamp}"]
@@ -350,7 +411,6 @@ def build_ics(events):
         lines += [fold(f"SUMMARY:{emoji} {e['title']}"),
                   fold(f"DESCRIPTION:{desc}"),
                   "END:VEVENT"]
-
     lines.append("END:VCALENDAR")
     return "\r\n".join(lines)
 
@@ -373,7 +433,10 @@ if __name__ == "__main__":
     os.makedirs("docs", exist_ok=True)
 
     cached = load_cache()
-    print(f"📂 Cache: {len(cached)} events\n📡 Fetching all sources...")
+    # Always clear old FOMC + BEA entries so fresh data wins cleanly
+    cached = {k: v for k, v in cached.items()
+              if not k.startswith("FOMC|") and not k.startswith("BEA|")}
+    print(f"📂 Cache: {len(cached)} events (FOMC+BEA cleared)\n📡 Fetching...")
 
     fresh = {}
     fresh.update(fetch_forexfactory())
