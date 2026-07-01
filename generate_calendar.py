@@ -128,11 +128,14 @@ def keywords(title):
 def deduplicate(events):
     """
     Remove events that are near-duplicates:
-    same date window (≤90 min apart) AND share ≥1 significant keyword.
-    Lower-priority source is dropped.
+    same calendar day (within 20 hours) AND share ≥1 significant keyword.
+    Lower-priority source is dropped. 20h (not 90min) because calculated
+    estimates (BLS/ISM/CB) can be off by several hours from the real
+    ForexFactory-reported release time, yet still refer to the same release.
     """
     items  = list(events.items())
     remove = set()
+    WINDOW_SECONDS = 20 * 3600   # 20 hours
 
     for i in range(len(items)):
         if items[i][0] in remove: continue
@@ -146,12 +149,11 @@ def deduplicate(events):
             k2, e2 = items[j]
             dt2 = datetime.fromisoformat(e2["dt_utc"])
 
-            if abs((dt1 - dt2).total_seconds()) > 5400:   # > 90 min → different events
+            if abs((dt1 - dt2).total_seconds()) > WINDOW_SECONDS:
                 continue
-            if not kw1.intersection(keywords(e2["title"])): # no shared keyword → different
+            if not kw1.intersection(keywords(e2["title"])):
                 continue
 
-            # Duplicate — keep higher priority
             p2 = SRC_PRIORITY.get(e2.get("source", ""), 0)
             if p1 >= p2:
                 remove.add(k2)
@@ -488,39 +490,64 @@ EARNINGS_FALLBACK = {
 # Samsung preliminary (잠정실적) — always added, separate event from full results
 SAMSUNG_PRELIM = [(1,7),(4,8),(7,8),(10,8)]   # ~5th-8th business day, 08:00 KST
 
+def get_yahoo_session():
+    """
+    Yahoo Finance requires a session cookie + crumb token since 2023.
+    Plain unauthenticated GETs are silently rejected (empty/error response).
+    This establishes a valid session once per run.
+    """
+    session = requests.Session()
+    session.headers.update(YF_HEADERS)
+    try:
+        # Step 1: hit Yahoo to receive a session cookie
+        session.get("https://fc.yahoo.com", timeout=10)
+    except Exception:
+        pass
+    try:
+        # Step 2: exchange the cookie for a crumb token
+        r = session.get("https://query1.finance.yahoo.com/v1/test/getcrumb",
+                        timeout=10)
+        crumb = r.text.strip()
+        if crumb and "Too Many Requests" not in crumb and len(crumb) < 50:
+            return session, crumb
+    except Exception:
+        pass
+    return session, None
+
+
 def fetch_korean_earnings():
     out      = {}
     yf_count = 0
+    session, crumb = get_yahoo_session()
 
-    # ── Yahoo Finance live dates ──────────────────────────────────────────────
+    # ── Yahoo Finance live dates (authenticated session) ──────────────────────
     for ticker, (company, impact) in KOSPI_COMPANIES.items():
-        fetched = False
         for base in ["https://query2.finance.yahoo.com",
                      "https://query1.finance.yahoo.com"]:
-            url = (f"{base}/v10/finance/quoteSummary/{ticker}"
-                   f"?modules=calendarEvents")
+            url = f"{base}/v10/finance/quoteSummary/{ticker}?modules=calendarEvents"
+            if crumb:
+                url += f"&crumb={crumb}"
             try:
-                r      = requests.get(url, timeout=10, headers=YF_HEADERS)
-                r.raise_for_status()
-                result = (r.json().get("quoteSummary", {})
-                                  .get("result") or [])
+                r = session.get(url, timeout=10)
+                if r.status_code != 200:
+                    continue
+                result = (r.json().get("quoteSummary", {}).get("result") or [])
                 if not result: continue
-                dates  = (result[0].get("calendarEvents", {})
-                                   .get("earnings", {})
-                                   .get("earningsDate", []))
+                dates = (result[0].get("calendarEvents", {})
+                                  .get("earnings", {})
+                                  .get("earningsDate", []))
                 for ed in dates:
                     ts = ed.get("raw", 0)
                     if not ts: continue
                     dt_utc = datetime.fromtimestamp(ts, tz=UTC)
                     if dt_utc.year != YEAR: continue
-                    # One entry per quarter (keyed by ticker + YYYYMM)
                     key = f"EARN|{ticker}|{dt_utc.strftime('%Y%m')}|yf"
                     if key not in out:
                         out[key] = make_event(
                             f"🇰🇷 {company} Earnings", impact,
                             dt_utc, source="Yahoo Finance", country="KR")
                         yf_count += 1
-                fetched = True; break
+                break  # got a response from this base, no need to try the other
             except Exception:
                 continue
 
@@ -562,21 +589,8 @@ def fetch_korean_earnings():
 
 
 # ── ICS builder ───────────────────────────────────────────────────────────────
-# All event times are written in Asia/Singapore (SGT = UTC+8, no DST).
-# This means times display correctly in SGT on any device / calendar client,
-# regardless of the device's own timezone setting.
-
-VTIMEZONE_SGT = "\r\n".join([
-    "BEGIN:VTIMEZONE",
-    "TZID:Asia/Singapore",
-    "BEGIN:STANDARD",
-    "DTSTART:19700101T000000",
-    "TZOFFSETFROM:+0800",
-    "TZOFFSETTO:+0800",
-    "TZNAME:SGT",
-    "END:STANDARD",
-    "END:VTIMEZONE",
-])
+# Times are written in UTC (Z suffix). Calendar apps automatically convert
+# UTC to whatever timezone the device is set to — no hardcoded timezone.
 
 def fold(line, limit=75):
     if len(line) <= limit: return line
@@ -593,18 +607,15 @@ def build_ics(events):
         "PRODID:-//USD+KRW Economic Calendar//EN",
         "CALSCALE:GREGORIAN", "METHOD:PUBLISH",
         "X-WR-CALNAME:📊 USD & KRW Economic Calendar",
-        "X-WR-CALDESC:USA macro + Korea macro + KOSPI200 earnings — times in SGT",
-        "X-WR-TIMEZONE:Asia/Singapore",          # Apple Calendar hint
+        "X-WR-CALDESC:USA macro + Korea macro + KOSPI200 earnings — auto-updated daily",
         "REFRESH-INTERVAL;VALUE=DURATION:P1D",
         "X-PUBLISHED-TTL:P1D",
-        VTIMEZONE_SGT,                            # embedded timezone definition
     ]
     for e in sorted(events.values(), key=lambda x: x["dt_utc"]):
-        emoji   = IMPACT_EMOJI.get(e["impact"], "")
-        dt_utc  = datetime.fromisoformat(e["dt_utc"])
-        dt_sgt  = dt_utc.astimezone(SGT)          # convert to SGT
-        end_sgt = dt_sgt + timedelta(hours=1)
-        desc    = " | ".join(filter(None, [
+        emoji = IMPACT_EMOJI.get(e["impact"], "")
+        dt    = datetime.fromisoformat(e["dt_utc"])
+        end   = dt + timedelta(hours=1)
+        desc  = " | ".join(filter(None, [
             f"Forecast: {e['forecast']}" if e.get("forecast") else "",
             f"Previous: {e['previous']}" if e.get("previous") else "",
             f"Source: {e.get('source', '')}",
@@ -614,13 +625,11 @@ def build_ics(events):
                   f"UID:{e['uid']}@usd-krw-econ-cal",
                   f"DTSTAMP:{stamp}"]
         if e["all_day"]:
-            # All-day events: just a date, no timezone needed
-            lines += [f"DTSTART;VALUE=DATE:{dt_sgt.strftime('%Y%m%d')}",
-                      f"DTEND;VALUE=DATE:{(dt_sgt + timedelta(days=1)).strftime('%Y%m%d')}"]
+            lines += [f"DTSTART;VALUE=DATE:{dt.strftime('%Y%m%d')}",
+                      f"DTEND;VALUE=DATE:{end.strftime('%Y%m%d')}"]
         else:
-            # Timed events: local SGT time with explicit TZID
-            lines += [f"DTSTART;TZID=Asia/Singapore:{dt_sgt.strftime('%Y%m%dT%H%M%S')}",
-                      f"DTEND;TZID=Asia/Singapore:{end_sgt.strftime('%Y%m%dT%H%M%S')}"]
+            lines += [f"DTSTART:{dt.strftime('%Y%m%dT%H%M%SZ')}",
+                      f"DTEND:{end.strftime('%Y%m%dT%H%M%SZ')}"]
         lines += [fold(f"SUMMARY:{emoji} {e['title']}"),
                   fold(f"DESCRIPTION:{desc}"),
                   "END:VEVENT"]
