@@ -8,7 +8,7 @@
     "previous": "",
     "source": "BLS",
     "country": "US",
-    "uid": "7015bfb1-47e8-4419-a58f-fb3b30a547ba"
+    "uid": "4d58e844-1733-4740-a5b6-60f3ddc7ef76"
   },
   "BLS|2026-11-05|Productivity": {
     "title": "Productivity",
@@ -19,7 +19,7 @@
     "previous": "",
     "source": "BLS",
     "country": "US",
-    "uid": "1a0e724a-1a89-4588-a5ec-b8bc517685b6"
+    "uid": "2c382bbc-be39-4b44-8a51-23bf32a5f6e7"
   },
   "BLS|2026-11-06|Non-Farm Payrolls": {
     "title": "Non-Farm Payrolls",
@@ -30,7 +30,7 @@
     "previous": "",
     "source": "BLS",
     "country": "US",
-    "uid": "281dd175-9f73-40f6-9313-aeec69242c0b"
+    "uid": "f3edb7b3-98b4-4a29-b4db-7ce5cf79cd37"
   },
   "BLS|2026-11-10|CPI": {
     "title": "CPI",
@@ -41,7 +41,7 @@
     "previous": "",
     "source": "BLS",
     "country": "US",
-    "uid": "72a4a98d-a7d7-46b8-9ba7-6654287f0e6e"
+    "uid": "34c4afc4-d726-434a-917b-6a7bb262c031"
   },
   "BLS|2026-11-13|PPI": {
     "title": "PPI",
@@ -52,7 +52,7 @@
     "previous": "",
     "source": "BLS",
     "country": "US",
-    "uid": "2f3c088d-9aba-43d5-a5e4-4e11d25ab4f2"
+    "uid": "ab80b56d-c457-4503-b644-29c26a3625a0"
   },
   "BLS|2026-11-17|Import/Export Prices": {
     "title": "Import/Export Prices",
@@ -63,7 +63,7 @@
     "previous": "",
     "source": "BLS",
     "country": "US",
-    "uid": "6b3c1b4d-1c55-42e1-8891-e0740c185688"
+    "uid": "4f7727d0-bdb3-410c-84a8-7e578daa4441"
   },
   "BLS|2026-12-01|JOLTS": {
     "title": "JOLTS",
@@ -74,7 +74,7 @@
     "previous": "",
     "source": "BLS",
     "country": "US",
-    "uid": "9dcf67ce-185b-4700-a22c-c329268b12ca"
+    "uid": "10addf50-2893-4079-967e-0e8a93b25a6d"
   },
   "BLS|2026-12-04|Non-Farm Payrolls": {
     "title": "Non-Farm Payrolls",
@@ -85,7 +85,7 @@
     "previous": "",
     "source": "BLS",
     "country": "US",
-    "uid": "aa543634-2985-4b36-a796-3876d3af1e20"
+    "uid": "d0594f54-1d2e-4d17-926f-bdfb5c1fe56e"
   },
   "BLS|2026-12-08|Productivity": {
     "title": "Productivity",
@@ -96,7 +96,7 @@
     "previous": "",
     "source": "BLS",
     "country": "US",
-    "uid": "0de6a64f-a8ac-4829-b662-c74702f48d1e"
+    "uid": "3d6f5f7b-a33d-4e83-a38a-3a0812ae1036"
   },
   "BLS|2026-12-10|CPI": {
     "title": "CPI",
@@ -107,7 +107,7 @@
     "previous": "",
     "source": "BLS",
     "country": "US",
-    "uid": "7affa832-1335-4b5e-b41a-96c9ce0ef514"
+    "uid": "44072932-6040-4a02-b435-d48141c219e8"
   },
   "BLS|2026-12-15|PPI": {
     "title": "PPI",
@@ -118,7 +118,7 @@
     "previous": "",
     "source": "BLS",
     "country": "US",
-    "uid": "81a2be9c-436e-4b0b-b07a-fcab7771e966"
+    "uid": "b3733fcf-9add-4563-a0b6-ed63c14e0bed"
   },
   "BLS|2026-12-17|Import/Export Prices": {
     "title": "Import/Export Prices",
@@ -129,51 +129,84 @@
     "previous": "",
     "source": "BLS",
     "country": "US",
-    "uid": "ee11adc8-1607-4da2-a30e-2300e9d44c67"
+    "uid": "a68f9b70-1667-4fcc-b281-ae79ffd66f07"
   },
-  "FF|USD|10-22-2026|1230|unemployment claims": {
-    "title": "Unemployment Claims",
+  "FF|USD|10-27-2026|1400|cb consumer confidence": {
+    "title": "CB Consumer Confidence",
     "impact": "Medium",
-    "dt_utc": "2026-10-22T16:30:00+00:00",
+    "dt_utc": "2026-10-27T18:00:00+00:00",
     "all_day": false,
-    "forecast": "200K",
-    "previous": "199K",
+    "forecast": "80.5",
+    "previous": "81.9",
     "source": "ForexFactory",
     "country": "US",
-    "uid": "4b297daa-ca97-43ca-9257-ea8b2e661e5d"
+    "uid": "1ea0e5c5-9c72-490c-beb1-c92cd371aa82"
   },
-  "FF|USD|10-23-2026|1345|flash manufacturing pmi": {
-    "title": "Flash Manufacturing PMI",
-    "impact": "Medium",
-    "dt_utc": "2026-10-23T17:45:00+00:00",
-    "all_day": false,
-    "forecast": "55.4",
-    "previous": "57.0",
-    "source": "ForexFactory",
-    "country": "US",
-    "uid": "a2183ec8-23d4-4850-875a-9aeba0229d31"
-  },
-  "FF|USD|10-23-2026|1400|revised uom consumer sentiment": {
-    "title": "Revised UoM Consumer Sentiment",
-    "impact": "Medium",
-    "dt_utc": "2026-10-23T18:00:00+00:00",
-    "all_day": false,
-    "forecast": "46.3",
-    "previous": "46.3",
-    "source": "ForexFactory",
-    "country": "US",
-    "uid": "39b250f1-b56f-441c-8f68-bcb9bcce4660"
-  },
-  "FOMC|2026-10-28": {
-    "title": "\ud83c\udfdb FOMC Rate Decision",
+  "FF|USD|10-28-2026|1800|federal funds rate": {
+    "title": "Federal Funds Rate",
     "impact": "High",
-    "dt_utc": "2026-10-28T18:00:00+00:00",
+    "dt_utc": "2026-10-28T22:00:00+00:00",
+    "all_day": false,
+    "forecast": "4.00%",
+    "previous": "4.00%",
+    "source": "ForexFactory",
+    "country": "US",
+    "uid": "1485da72-3d7d-466a-a9fe-bf51ce68d139"
+  },
+  "FF|USD|10-28-2026|1800|fomc statement": {
+    "title": "FOMC Statement",
+    "impact": "High",
+    "dt_utc": "2026-10-28T22:00:00+00:00",
     "all_day": false,
     "forecast": "",
     "previous": "",
-    "source": "Federal Reserve",
+    "source": "ForexFactory",
     "country": "US",
-    "uid": "f4b3482c-1ea1-4be2-b98d-cc4848a00ba5"
+    "uid": "ee742454-717f-40f2-827b-5ca15842f991"
+  },
+  "FF|USD|10-29-2026|1230|advance gdp qq": {
+    "title": "Advance GDP q/q",
+    "impact": "High",
+    "dt_utc": "2026-10-29T16:30:00+00:00",
+    "all_day": false,
+    "forecast": "3.2%",
+    "previous": "1.5%",
+    "source": "ForexFactory",
+    "country": "US",
+    "uid": "54187641-875f-49f0-a97f-6f352c8369db"
+  },
+  "FF|USD|10-29-2026|1230|core pce price index mm": {
+    "title": "Core PCE Price Index m/m",
+    "impact": "High",
+    "dt_utc": "2026-10-29T16:30:00+00:00",
+    "all_day": false,
+    "forecast": "0.3%",
+    "previous": "0.2%",
+    "source": "ForexFactory",
+    "country": "US",
+    "uid": "a5d24671-0b4b-40cc-9887-76503fba578d"
+  },
+  "FF|USD|10-29-2026|1230|unemployment claims": {
+    "title": "Unemployment Claims",
+    "impact": "Medium",
+    "dt_utc": "2026-10-29T16:30:00+00:00",
+    "all_day": false,
+    "forecast": "198K",
+    "previous": "194K",
+    "source": "ForexFactory",
+    "country": "US",
+    "uid": "e446b894-133d-4445-9ae6-b3177bd7d878"
+  },
+  "FF|USD|10-30-2026|1230|employment cost index qq": {
+    "title": "Employment Cost Index q/q",
+    "impact": "Medium",
+    "dt_utc": "2026-10-30T16:30:00+00:00",
+    "all_day": false,
+    "forecast": "0.8%",
+    "previous": "0.9%",
+    "source": "ForexFactory",
+    "country": "US",
+    "uid": "1b243d7b-3818-47b3-9962-d7bddef4da37"
   },
   "FOMC|2026-12-09": {
     "title": "\ud83c\udfdb FOMC Rate Decision",
@@ -184,18 +217,7 @@
     "previous": "",
     "source": "Federal Reserve",
     "country": "US",
-    "uid": "2c43cb7d-cb78-4b1a-b2de-0e7cbd03f506"
-  },
-  "BEA|2026-10-29|GDP (Advance)|10": {
-    "title": "GDP (Advance)",
-    "impact": "High",
-    "dt_utc": "2026-10-29T12:30:00+00:00",
-    "all_day": false,
-    "forecast": "",
-    "previous": "",
-    "source": "BEA",
-    "country": "US",
-    "uid": "19319ffa-ec45-4478-b6c4-b78cda681a52"
+    "uid": "dbbdfdcf-da50-4cb9-8387-ba91a4d1bee3"
   },
   "BEA|2026-11-24|GDP (2nd Est.)|11": {
     "title": "GDP (2nd Est.)",
@@ -206,7 +228,7 @@
     "previous": "",
     "source": "BEA",
     "country": "US",
-    "uid": "cf40887c-b63e-48c3-af3c-66d3d7918aa9"
+    "uid": "d46106a9-9755-416f-9193-dcd31683d1e1"
   },
   "BEA|2026-12-22|GDP (3rd Est.)|12": {
     "title": "GDP (3rd Est.)",
@@ -217,18 +239,7 @@
     "previous": "",
     "source": "BEA",
     "country": "US",
-    "uid": "39853c75-b45c-43ca-9609-bb236233d112"
-  },
-  "BEA|2026-10-30|PCE / Personal Income|10": {
-    "title": "PCE / Personal Income",
-    "impact": "High",
-    "dt_utc": "2026-10-30T12:30:00+00:00",
-    "all_day": false,
-    "forecast": "",
-    "previous": "",
-    "source": "BEA",
-    "country": "US",
-    "uid": "c48db771-4a2a-4c1a-a0f4-b70bf64ef1f8"
+    "uid": "843812b2-6505-4854-b9c6-25bde3499e24"
   },
   "BEA|2026-11-25|PCE / Personal Income|11": {
     "title": "PCE / Personal Income",
@@ -239,7 +250,7 @@
     "previous": "",
     "source": "BEA",
     "country": "US",
-    "uid": "4aa90725-e622-496d-9ecf-2311aedff5d1"
+    "uid": "5070752a-d91d-466b-88ae-b04796f7b18e"
   },
   "BEA|2026-12-23|PCE / Personal Income|12": {
     "title": "PCE / Personal Income",
@@ -250,7 +261,7 @@
     "previous": "",
     "source": "BEA",
     "country": "US",
-    "uid": "ecca6b46-d634-4301-bd58-d69d76ddaa2b"
+    "uid": "c02bed34-0a19-4202-bc05-88266f7d2e7f"
   },
   "ISM|ISM|2026-11-02": {
     "title": "ISM Manufacturing PMI",
@@ -261,7 +272,7 @@
     "previous": "",
     "source": "ISM",
     "country": "US",
-    "uid": "acfc2510-efdb-4242-91f8-c3fbcce72b22"
+    "uid": "9566f6e9-0a89-4db7-9980-39b36c435562"
   },
   "ISM|ISM|2026-11-04": {
     "title": "ISM Services PMI",
@@ -272,7 +283,7 @@
     "previous": "",
     "source": "ISM",
     "country": "US",
-    "uid": "adace509-2b4c-4cd7-9870-02cee0f2c3c6"
+    "uid": "1b055a68-004b-481f-a7fe-b81a23a3d125"
   },
   "ISM|ISM|2026-12-01": {
     "title": "ISM Manufacturing PMI",
@@ -283,7 +294,7 @@
     "previous": "",
     "source": "ISM",
     "country": "US",
-    "uid": "12409f6f-d72e-49e0-9776-febb778bd5a6"
+    "uid": "241621d4-d02d-4fee-92aa-3979b0e38187"
   },
   "ISM|ISM|2026-12-03": {
     "title": "ISM Services PMI",
@@ -294,18 +305,7 @@
     "previous": "",
     "source": "ISM",
     "country": "US",
-    "uid": "01593167-b918-4191-95f4-3acc5cf2322f"
-  },
-  "CB|2026-10-27": {
-    "title": "Consumer Confidence (CB)",
-    "impact": "Medium",
-    "dt_utc": "2026-10-27T14:00:00+00:00",
-    "all_day": false,
-    "forecast": "",
-    "previous": "",
-    "source": "Conference Board",
-    "country": "US",
-    "uid": "053207fd-5088-4123-ae16-a595f257fcfa"
+    "uid": "fa8216cf-28ea-499a-945f-2d1bb37b6b56"
   },
   "CB|2026-11-24": {
     "title": "Consumer Confidence (CB)",
@@ -316,7 +316,7 @@
     "previous": "",
     "source": "Conference Board",
     "country": "US",
-    "uid": "2922062a-714c-4c6f-bcea-b8f00a033739"
+    "uid": "9b1fdc93-8fb1-4929-83b4-4f36a3b1e0fd"
   },
   "CB|2026-12-29": {
     "title": "Consumer Confidence (CB)",
@@ -327,7 +327,18 @@
     "previous": "",
     "source": "Conference Board",
     "country": "US",
-    "uid": "1b109d65-ba92-40e5-b2a8-07faf4c65055"
+    "uid": "e8a5db2a-119a-4c0f-8ab6-91c3c763ed2f"
+  },
+  "UOM|Final|2026-10-23": {
+    "title": "Consumer Sentiment UoM (Final)",
+    "impact": "Medium",
+    "dt_utc": "2026-10-23T14:00:00+00:00",
+    "all_day": false,
+    "forecast": "",
+    "previous": "",
+    "source": "U of Michigan",
+    "country": "US",
+    "uid": "1accce5c-8125-4a9e-9f9a-1fe842237b19"
   },
   "UOM|Prelim|2026-11-13": {
     "title": "Consumer Sentiment UoM (Prelim)",
@@ -338,7 +349,7 @@
     "previous": "",
     "source": "U of Michigan",
     "country": "US",
-    "uid": "2fc1c3eb-3688-4e15-a3d5-7b4388d2eb7d"
+    "uid": "231d0ca5-9209-491f-9a32-18ee210198f3"
   },
   "UOM|Final|2026-11-27": {
     "title": "Consumer Sentiment UoM (Final)",
@@ -349,7 +360,7 @@
     "previous": "",
     "source": "U of Michigan",
     "country": "US",
-    "uid": "9b87dc1b-552f-4218-9ea2-0a0126303ba5"
+    "uid": "8f3c2729-757a-45be-b94f-c5a349ba178a"
   },
   "UOM|Prelim|2026-12-11": {
     "title": "Consumer Sentiment UoM (Prelim)",
@@ -360,7 +371,7 @@
     "previous": "",
     "source": "U of Michigan",
     "country": "US",
-    "uid": "d519dcdd-c180-4309-985f-7df984e2aace"
+    "uid": "47fa8ede-aa22-45e5-ac0b-f389a01a4246"
   },
   "UOM|Final|2026-12-25": {
     "title": "Consumer Sentiment UoM (Final)",
@@ -371,7 +382,7 @@
     "previous": "",
     "source": "U of Michigan",
     "country": "US",
-    "uid": "d3cb7490-a1ba-409b-a074-4a3b4bdf4864"
+    "uid": "272143ac-f5c2-4879-883b-a5525748d702"
   },
   "BOK|2026-11-19": {
     "title": "\ud83c\uddf0\ud83c\uddf7 BOK Interest Rate Decision",
@@ -382,7 +393,7 @@
     "previous": "",
     "source": "Bank of Korea",
     "country": "KR",
-    "uid": "7537a8af-f70e-41ee-937d-f3d0bb50dbed"
+    "uid": "375b2a7a-e1dd-4a07-b26b-11a2ea96b0c1"
   },
   "EARN|005930.KS|202610|yf": {
     "title": "\ud83c\uddf0\ud83c\uddf7 Samsung Electronics Earnings",
@@ -393,7 +404,7 @@
     "previous": "",
     "source": "Yahoo Finance",
     "country": "KR",
-    "uid": "1ed7d559-e6e1-4a64-b4cf-e778f233c65b"
+    "uid": "2cc076c6-793b-43a4-a004-16c55ef9c600"
   },
   "EARN|000660.KS|202610|yf": {
     "title": "\ud83c\uddf0\ud83c\uddf7 SK Hynix Earnings",
@@ -404,7 +415,7 @@
     "previous": "",
     "source": "Yahoo Finance",
     "country": "KR",
-    "uid": "8ec536f7-135c-4706-b84f-c54fd6be4421"
+    "uid": "7c3baf71-8123-4bd6-bef1-c88bee3ad210"
   },
   "EARN|373220.KS|202611|yf": {
     "title": "\ud83c\uddf0\ud83c\uddf7 LG Energy Solution Earnings",
@@ -415,7 +426,7 @@
     "previous": "",
     "source": "Yahoo Finance",
     "country": "KR",
-    "uid": "7e3fe128-3995-4afa-ad12-5350da0a6214"
+    "uid": "732ec071-564e-4638-9140-b5027c2cd407"
   },
   "EARN|005380.KS|202610|yf": {
     "title": "\ud83c\uddf0\ud83c\uddf7 Hyundai Motor Earnings",
@@ -426,6 +437,6 @@
     "previous": "",
     "source": "Yahoo Finance",
     "country": "KR",
-    "uid": "bc16eb50-8b59-430d-8159-a8c75b960a09"
+    "uid": "12eae874-65e6-4241-b800-d495baab8c1f"
   }
 }
