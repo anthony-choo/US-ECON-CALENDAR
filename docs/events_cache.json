@@ -8,7 +8,7 @@
     "previous": "",
     "source": "BLS",
     "country": "US",
-    "uid": "ac8ef6a2-122b-4bc7-a095-4fcd9352562c"
+    "uid": "8a9a4c6d-a299-4cb9-99dc-c9d786147fcf"
   },
   "BLS|2026-12-01|JOLTS": {
     "title": "JOLTS",
@@ -19,7 +19,7 @@
     "previous": "",
     "source": "BLS",
     "country": "US",
-    "uid": "47a8ae82-4eb3-4537-870b-f216482494bc"
+    "uid": "17f3f29e-57f6-4e9e-982d-d9f32d83b672"
   },
   "BLS|2026-12-04|Non-Farm Payrolls": {
     "title": "Non-Farm Payrolls",
@@ -30,7 +30,7 @@
     "previous": "",
     "source": "BLS",
     "country": "US",
-    "uid": "5daa97b5-73f6-4e2b-aa5a-e943927904ba"
+    "uid": "f46bc152-674d-4328-a250-93f884db0f8f"
   },
   "BLS|2026-12-08|Productivity": {
     "title": "Productivity",
@@ -41,7 +41,7 @@
     "previous": "",
     "source": "BLS",
     "country": "US",
-    "uid": "8232c073-43bc-4a29-b9de-5e7666d0db7b"
+    "uid": "8dfca34f-62e7-4cb1-9d44-650ff076e973"
   },
   "BLS|2026-12-10|CPI": {
     "title": "CPI",
@@ -52,7 +52,7 @@
     "previous": "",
     "source": "BLS",
     "country": "US",
-    "uid": "083b7e04-5def-46c3-b599-c9e716550865"
+    "uid": "e2ab3fa9-6863-49ac-9f08-22af7b2b2bb0"
   },
   "BLS|2026-12-15|PPI": {
     "title": "PPI",
@@ -63,7 +63,7 @@
     "previous": "",
     "source": "BLS",
     "country": "US",
-    "uid": "cd052bb6-d22c-407c-b681-e753baa136cf"
+    "uid": "834192af-3d86-4881-a360-77e0a1ac44b2"
   },
   "BLS|2026-12-17|Import/Export Prices": {
     "title": "Import/Export Prices",
@@ -74,7 +74,7 @@
     "previous": "",
     "source": "BLS",
     "country": "US",
-    "uid": "f7fad067-3770-424e-af38-866691637afa"
+    "uid": "35a4c86b-c80b-4604-bf48-c1617cbe2323"
   },
   "BLS|2026-11-20|Productivity": {
     "title": "Productivity",
@@ -85,18 +85,7 @@
     "previous": "",
     "source": "BLS",
     "country": "US",
-    "uid": "57abfb75-d8b7-4e2b-a2ba-4f1c3acbac26"
-  },
-  "BLS|2026-11-13|PPI": {
-    "title": "PPI",
-    "impact": "Medium",
-    "dt_utc": "2026-11-13T13:30:00+00:00",
-    "all_day": false,
-    "forecast": "",
-    "previous": "",
-    "source": "BLS",
-    "country": "US",
-    "uid": "0f0ce250-00bd-43bc-a5d0-b8e6f3bb39d4"
+    "uid": "fe75dc81-d832-4e66-8701-e2cb14487c36"
   },
   "FF|USD|11-16-2026|1700|fed chairman warsh speaks": {
     "title": "Fed Chairman Warsh Speaks",
@@ -107,7 +96,7 @@
     "previous": "",
     "source": "ForexFactory",
     "country": "US",
-    "uid": "941fe9ac-1356-4178-934d-3f9b11840afb"
+    "uid": "0d1ffe03-8ccc-42b6-8191-9c69f2d9ece9"
   },
   "FF|USD|11-17-2026|1330|core retail sales mm": {
     "title": "Core Retail Sales m/m",
@@ -118,7 +107,7 @@
     "previous": "0.9%",
     "source": "ForexFactory",
     "country": "US",
-    "uid": "44be3315-4a1e-4faf-92e9-4fb5f301a9da"
+    "uid": "71ceb608-c465-477a-aa24-eb39f7ca0516"
   },
   "FF|USD|11-18-2026|1900|fomc meeting minutes": {
     "title": "FOMC Meeting Minutes",
@@ -129,7 +118,7 @@
     "previous": "",
     "source": "ForexFactory",
     "country": "US",
-    "uid": "1581fa68-a0be-4909-a338-9862536916e7"
+    "uid": "f212be77-d245-4bb0-803c-738c898338d6"
   },
   "FF|USD|11-19-2026|1330|philly fed manufacturing index": {
     "title": "Philly Fed Manufacturing Index",
@@ -140,7 +129,7 @@
     "previous": "20.9",
     "source": "ForexFactory",
     "country": "US",
-    "uid": "89096a07-32ee-4c43-a61c-e3fbd51583d7"
+    "uid": "2c1352ea-268a-4730-88d0-a8b5cf73df14"
   },
   "FF|USD|11-19-2026|1330|unemployment claims": {
     "title": "Unemployment Claims",
@@ -151,7 +140,7 @@
     "previous": "200K",
     "source": "ForexFactory",
     "country": "US",
-    "uid": "f6e0315a-92cf-468e-9eae-f750928976d4"
+    "uid": "5ab91507-e011-4364-81c9-38f7355e3293"
   },
   "FF|USD|11-20-2026|1500|revised uom consumer sentiment": {
     "title": "Revised UoM Consumer Sentiment",
@@ -162,7 +151,18 @@
     "previous": "51.0",
     "source": "ForexFactory",
     "country": "US",
-    "uid": "623bd319-e845-48a8-b51b-cc2d96be13b3"
+    "uid": "e83fcfee-73f0-4c2f-bde3-fc6eff249385"
+  },
+  "FF|USD|11-20-2026|1700|president trump speaks": {
+    "title": "President Trump Speaks",
+    "impact": "Medium",
+    "dt_utc": "2026-11-20T22:00:00+00:00",
+    "all_day": false,
+    "forecast": "",
+    "previous": "",
+    "source": "ForexFactory",
+    "country": "US",
+    "uid": "d4e3169a-3c79-4aa7-ad79-6f4f7a7dc051"
   },
   "FOMC|2026-12-09": {
     "title": "\ud83c\udfdb FOMC Rate Decision",
@@ -173,7 +173,7 @@
     "previous": "",
     "source": "Federal Reserve",
     "country": "US",
-    "uid": "43ac126c-45fe-460b-b1f4-f555566700da"
+    "uid": "894b959f-6997-4b22-b63f-2587e4b591f3"
   },
   "BEA|2026-11-24|GDP (2nd Est.)|11": {
     "title": "GDP (2nd Est.)",
@@ -184,7 +184,7 @@
     "previous": "",
     "source": "BEA",
     "country": "US",
-    "uid": "46861411-2e01-4c44-8a11-ee249bf48bde"
+    "uid": "0b49099d-8c37-45cf-ae74-95f87a976b4a"
   },
   "BEA|2026-12-22|GDP (3rd Est.)|12": {
     "title": "GDP (3rd Est.)",
@@ -195,7 +195,7 @@
     "previous": "",
     "source": "BEA",
     "country": "US",
-    "uid": "f7d9bd51-0724-4553-93ff-f36634a1361a"
+    "uid": "7250771c-c2e4-4a87-b043-47e5de87cf8a"
   },
   "BEA|2026-11-25|PCE / Personal Income|11": {
     "title": "PCE / Personal Income",
@@ -206,7 +206,7 @@
     "previous": "",
     "source": "BEA",
     "country": "US",
-    "uid": "5119d3ae-d343-4549-9b02-67da2c96a9ab"
+    "uid": "d081d51c-de18-4907-ae65-6fdcf17e9a0b"
   },
   "BEA|2026-12-23|PCE / Personal Income|12": {
     "title": "PCE / Personal Income",
@@ -217,7 +217,7 @@
     "previous": "",
     "source": "BEA",
     "country": "US",
-    "uid": "ba775f2f-3831-47ae-9173-6eef7d1b62ce"
+    "uid": "0e703d05-d1b3-4527-8955-eba224285651"
   },
   "ISM|ISM|2026-12-01": {
     "title": "ISM Manufacturing PMI",
@@ -228,7 +228,7 @@
     "previous": "",
     "source": "ISM",
     "country": "US",
-    "uid": "548dc3c2-50cb-4b39-976a-e47ff6a48dd8"
+    "uid": "40fd38ee-be30-4da7-8bbb-59cece289c13"
   },
   "ISM|ISM|2026-12-03": {
     "title": "ISM Services PMI",
@@ -239,7 +239,7 @@
     "previous": "",
     "source": "ISM",
     "country": "US",
-    "uid": "d1fd1b2e-67b3-422c-9d73-49f85e2400c4"
+    "uid": "f5ef6e78-522a-4652-8e76-dee142f0a625"
   },
   "CB|2026-11-24": {
     "title": "Consumer Confidence (CB)",
@@ -250,7 +250,7 @@
     "previous": "",
     "source": "Conference Board",
     "country": "US",
-    "uid": "8600f797-4760-49af-8ed6-7376a31fd36d"
+    "uid": "c8bdb72b-5b5a-4f5a-b39a-e8d715603c24"
   },
   "CB|2026-12-29": {
     "title": "Consumer Confidence (CB)",
@@ -261,18 +261,7 @@
     "previous": "",
     "source": "Conference Board",
     "country": "US",
-    "uid": "db337fc5-d00c-478a-aaa7-5d1ed4f780a5"
-  },
-  "UOM|Prelim|2026-11-13": {
-    "title": "Consumer Sentiment UoM (Prelim)",
-    "impact": "Medium",
-    "dt_utc": "2026-11-13T15:00:00+00:00",
-    "all_day": false,
-    "forecast": "",
-    "previous": "",
-    "source": "U of Michigan",
-    "country": "US",
-    "uid": "2f270ba5-fa40-44ea-8cf6-bf8d953cf55e"
+    "uid": "ffd9b1fe-ea61-4b66-995e-a88d671fe8c5"
   },
   "UOM|Final|2026-11-27": {
     "title": "Consumer Sentiment UoM (Final)",
@@ -283,7 +272,7 @@
     "previous": "",
     "source": "U of Michigan",
     "country": "US",
-    "uid": "b57e154e-4c2e-4c83-bbaa-0eaae92a7e6b"
+    "uid": "a5b0a87b-ad7e-48eb-aabf-c4954bd610d5"
   },
   "UOM|Prelim|2026-12-11": {
     "title": "Consumer Sentiment UoM (Prelim)",
@@ -294,7 +283,7 @@
     "previous": "",
     "source": "U of Michigan",
     "country": "US",
-    "uid": "5aedc036-b469-4060-87ed-b90d797cc6b4"
+    "uid": "f443cbd1-7c3c-4b81-a779-3683cadbc2f8"
   },
   "UOM|Final|2026-12-25": {
     "title": "Consumer Sentiment UoM (Final)",
@@ -305,7 +294,7 @@
     "previous": "",
     "source": "U of Michigan",
     "country": "US",
-    "uid": "fa407e47-6318-4e83-bc46-7575111b3512"
+    "uid": "4efe4a31-7ac1-4944-a288-fee15a00e1a9"
   },
   "BOK|2026-11-19": {
     "title": "\ud83c\uddf0\ud83c\uddf7 BOK Interest Rate Decision",
@@ -316,6 +305,6 @@
     "previous": "",
     "source": "Bank of Korea",
     "country": "KR",
-    "uid": "aae04ac2-7988-464a-bcd5-7d7bcdf22e40"
+    "uid": "041703d9-d5b9-4248-9138-1b40098c1324"
   }
 }
